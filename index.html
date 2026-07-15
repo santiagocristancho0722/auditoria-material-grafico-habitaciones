@@ -71,6 +71,7 @@ header{background:var(--navy);padding:30px 48px 24px}.ht{font-family:'DM Serif D
   <span class="filtro-lbl">Filtro de cobertura:</span>
   <button class="fbtn active" id="fb_all" onclick="sf('all')">Todos los hoteles</button>
   <button class="fbtn" id="fb_full" onclick="sf('full')">Solo cobertura completa</button>
+  <button class="fbtn" id="fb_partial" onclick="sf('partial')">Cobertura incompleta</button>
   <span class="filtro-hint" id="filtro_hint"></span>
 </div>
 <div class="panel active" id="pane_todos"><div class="hc" id="card_all_h0" data-cob="partial"><div class="hh" onclick="th('all_h0')">
@@ -3262,18 +3263,21 @@ function sf(modo){
   FILTRO=modo;
   document.getElementById('fb_all').classList.toggle('active',modo==='all');
   document.getElementById('fb_full').classList.toggle('active',modo==='full');
+  document.getElementById('fb_partial').classList.toggle('active',modo==='partial');
   aplicarFiltro();
 }
 function aplicarFiltro(){
   const panel=document.querySelector('.panel.active'); if(!panel) return;
   const cards=panel.querySelectorAll('.hc'); let vis=0;
   cards.forEach(c=>{
-    const ok = FILTRO==='all' || c.getAttribute('data-cob')==='full';
+    const cob = c.getAttribute('data-cob');
+    const ok = FILTRO==='all' || (FILTRO==='full' && cob==='full') || (FILTRO==='partial' && cob==='partial');
     c.classList.toggle('oculto',!ok);
     if(ok) vis++;
   });
   const hint=document.getElementById('filtro_hint');
   if(FILTRO==='full') hint.textContent=vis+' de '+cards.length+' hoteles con cobertura completa en todos sus tipos';
+  else if(FILTRO==='partial') hint.textContent=vis+' de '+cards.length+' hoteles con cobertura incompleta (falta al menos un tipo por revisar)';
   else hint.textContent='';
 }
 document.addEventListener('DOMContentLoaded',aplicarFiltro);
